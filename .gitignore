@@ -1,0 +1,11 @@
+# Entorno virtual: lo regenera cada quien con requirements.txt
+.venv/
+__pycache__/
+
+# El modelo se descarga solo la primera vez (5 MB)
+*.pt
+
+.DS_Store
+
+# NOTA: salida/ y videos/ SI se suben a proposito, para que se puedan
+# ver los resultados sin tener que correr nada.

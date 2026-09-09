@@ -1,0 +1,20 @@
+{
+  "video": "videos/vtest.avi",
+  "linea": {
+    "A": [
+      450,
+      520
+    ],
+    "B": [
+      450,
+      100
+    ]
+  },
+  "direccion_positiva": "izq_a_der",
+  "direccion_negativa": "der_a_izq",
+  "confianza": 0.35,
+  "margen_px": 12,
+  "imgsz": 640,
+  "salida_video": "salida/resultado.mp4",
+  "salida_csv": "salida/conteo.csv"
+}
