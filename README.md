@@ -131,6 +131,18 @@ python contador.py
 
 ---
 
+## Dashboard
+
+`dashboard/aforo.html` es un panel que presenta los resultados como si fueran la
+entrada de un restaurante: cuántos entraron, cuántos salieron, cuánta gente había
+dentro en cada momento, y la bitácora completa de cruces.
+
+Ábrelo con doble clic, no necesita servidor ni dependencias.
+
+Los cruces son los reales que midió el sistema sobre `vtest.avi`. El encuadre de
+restaurante es una simulación: cuál dirección es "hacia adentro" se decide al
+calibrar la línea. Ninguna cifra proviene de un local real, y el panel lo dice.
+
 ## Estructura
 
 | Archivo | Qué hace |

@@ -1,0 +1,601 @@
+<title>Aforo en Puerta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+:root {
+  --plane:      #eef0f1;
+  --surface:    #fafbfb;
+  --surface-2:  #f3f5f6;
+  --ink:        #0e1214;
+  --ink-2:      #4e5559;
+  --muted:      #868d91;
+  --grid:       #dfe3e4;
+  --rule:       #ccd2d4;
+  --entra:      #1baf7a;
+  --sale:       #eb6834;
+  --entra-fill: rgba(27, 175, 122, .16);
+  --brass:      #a37430;
+  --on-ink:     #eef0f1;
+  --on-ink-2:   rgba(238,240,241,.66);
+  --shadow:     0 1px 2px rgba(14,18,20,.06), 0 8px 24px -12px rgba(14,18,20,.18);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --plane:      #101314;
+    --surface:    #191d1f;
+    --surface-2:  #1f2426;
+    --ink:        #f4f6f6;
+    --ink-2:      #b4bbbe;
+    --muted:      #7e868a;
+    --grid:       #2a2f32;
+    --rule:       #333a3d;
+    --entra:      #199e70;
+    --sale:       #d95926;
+    --entra-fill: rgba(25, 158, 112, .20);
+    --brass:      #c99a4e;
+    --on-ink:     #101314;
+    --on-ink-2:   rgba(16,19,20,.62);
+    --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"] {
+  --plane:      #101314;
+  --surface:    #191d1f;
+  --surface-2:  #1f2426;
+  --ink:        #f4f6f6;
+  --ink-2:      #b4bbbe;
+  --muted:      #7e868a;
+  --grid:       #2a2f32;
+  --rule:       #333a3d;
+  --entra:      #199e70;
+  --sale:       #d95926;
+  --entra-fill: rgba(25, 158, 112, .20);
+  --brass:      #c99a4e;
+  --on-ink:     #101314;
+  --on-ink-2:   rgba(16,19,20,.62);
+  --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--plane);
+  color: var(--ink);
+  font-family: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+.envoltura {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px 24px 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* ---------- cabecera ---------- */
+
+.cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px 32px;
+  padding-bottom: 22px;
+  border-bottom: 2px solid var(--ink);
+}
+.eyebrow {
+  display: block;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin-bottom: 8px;
+}
+h1 {
+  font-family: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(2.1rem, 5.4vw, 3.1rem);
+  line-height: .98;
+  letter-spacing: -.025em;
+  margin: 0;
+  text-wrap: balance;
+}
+.sub {
+  margin: 10px 0 0;
+  color: var(--ink-2);
+  font-size: 1.02rem;
+  max-width: 46ch;
+}
+.ficha {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 3px 18px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.ficha dt { text-transform: uppercase; letter-spacing: .07em; }
+.ficha dd { margin: 0; color: var(--ink-2); text-align: right; }
+
+/* ---------- aviso de procedencia ---------- */
+
+.aviso {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  padding: 13px 16px;
+  background: var(--surface-2);
+  border-left: 3px solid var(--brass);
+  border-radius: 0 4px 4px 0;
+  font-size: .92rem;
+  color: var(--ink-2);
+}
+.aviso b { color: var(--ink); font-weight: 600; }
+
+/* ---------- cifras ---------- */
+
+.cifras {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px;
+}
+.cifra {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  padding: 18px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cifra.destacada {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--on-ink);
+  box-shadow: var(--shadow);
+}
+.cifra-etq {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.cifra.destacada .cifra-etq { color: var(--on-ink-2); }
+.punto { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.punto.e { background: var(--entra); }
+.punto.s { background: var(--sale); }
+.cifra-num {
+  font-family: "Bricolage Grotesque", ui-sans-serif, sans-serif;
+  font-size: 2.85rem;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums;
+}
+.cifra-pie { font-size: .84rem; color: var(--muted); }
+.cifra.destacada .cifra-pie { color: var(--on-ink-2); }
+
+/* ---------- bloques de grafica ---------- */
+
+.bloque {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  padding: 22px 24px 18px;
+}
+.bloque-cab {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 20px;
+  margin-bottom: 4px;
+}
+h2 {
+  font-family: "Bricolage Grotesque", ui-sans-serif, sans-serif;
+  font-size: 1.22rem;
+  font-weight: 700;
+  letter-spacing: -.015em;
+  margin: 0;
+}
+.bloque-nota { font-size: .88rem; color: var(--muted); margin: 0 0 18px; max-width: 62ch; }
+.leyenda {
+  display: flex;
+  gap: 16px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+
+.lienzo { position: relative; }
+.lienzo svg { display: block; width: 100%; height: auto; overflow: visible; }
+.eje { fill: var(--muted); font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 11px; }
+.rejilla { stroke: var(--grid); stroke-width: 1; }
+.base { stroke: var(--rule); stroke-width: 1.5; }
+
+.globo {
+  position: absolute;
+  pointer-events: none;
+  background: var(--ink);
+  color: var(--on-ink);
+  padding: 7px 11px;
+  border-radius: 4px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11.5px;
+  line-height: 1.5;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity .12s;
+  z-index: 5;
+  box-shadow: var(--shadow);
+}
+.globo.visible { opacity: 1; }
+.globo b { font-weight: 600; }
+
+/* ---------- bitacora ---------- */
+
+.tabla-caja { overflow-x: auto; margin-top: 4px; }
+table { border-collapse: collapse; width: 100%; min-width: 460px; font-size: .92rem; }
+th {
+  text-align: left;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0 14px 9px 0;
+  border-bottom: 1px solid var(--rule);
+}
+td {
+  padding: 8px 14px 8px 0;
+  border-bottom: 1px solid var(--grid);
+  font-variant-numeric: tabular-nums;
+}
+td.num { font-family: "IBM Plex Mono", ui-monospace, monospace; color: var(--ink-2); }
+tbody tr:hover { background: var(--surface-2); }
+.marca-dir {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+  font-size: .88rem;
+}
+.marca-dir.e { color: var(--entra); }
+.marca-dir.s { color: var(--sale); }
+.flecha { font-family: "IBM Plex Mono", monospace; }
+
+footer {
+  border-top: 1px solid var(--rule);
+  padding-top: 18px;
+  font-size: .86rem;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+}
+footer a { color: var(--ink-2); text-decoration-color: var(--rule); text-underline-offset: 3px; }
+footer a:hover { color: var(--ink); }
+
+:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; border-radius: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+@media (max-width: 560px) {
+  .envoltura { padding: 28px 16px 56px; gap: 24px; }
+  .bloque { padding: 18px 16px 14px; }
+  .cifra-num { font-size: 2.4rem; }
+}
+</style>
+
+<div class="envoltura">
+
+  <header class="cabecera">
+    <div>
+      <span class="eyebrow">Panel de servicio</span>
+      <h1>Aforo en Puerta</h1>
+      <p class="sub">Conteo automático de comensales que cruzan la entrada, con dirección.</p>
+    </div>
+    <dl class="ficha">
+      <dt>Ventana</dt><dd>79.4 s</dd>
+      <dt>Detector</dt><dd>YOLO11-nano</dd>
+      <dt>Seguimiento</dt><dd>ByteTrack</dd>
+      <dt>Proceso</dt><dd>42 fps</dd>
+    </dl>
+  </header>
+
+  <p class="aviso">
+    <b>Demostración.</b>
+    <span>Los cruces son reales, medidos por el sistema sobre el video de prueba
+    <code>vtest.avi</code> (79 s). El encuadre de restaurante es una simulación:
+    la dirección hacia el interior se asignó al calibrar la línea. Ninguna cifra
+    proviene de un local real.</span>
+  </p>
+
+  <section class="cifras" aria-label="Resumen del periodo">
+    <div class="cifra">
+      <span class="cifra-etq"><i class="punto e"></i>Entraron</span>
+      <span class="cifra-num" style="color:var(--entra)">13</span>
+      <span class="cifra-pie">comensales hacia el interior</span>
+    </div>
+    <div class="cifra">
+      <span class="cifra-etq"><i class="punto s"></i>Salieron</span>
+      <span class="cifra-num" style="color:var(--sale)">10</span>
+      <span class="cifra-pie">comensales hacia la calle</span>
+    </div>
+    <div class="cifra destacada">
+      <span class="cifra-etq">Dentro al cierre</span>
+      <span class="cifra-num">3</span>
+      <span class="cifra-pie">pico de 6 a los 27.8 s</span>
+    </div>
+  </section>
+
+  <section class="bloque">
+    <div class="bloque-cab">
+      <h2>Aforo a lo largo del servicio</h2>
+      <span class="leyenda"><span>Escalón por cada cruce</span></span>
+    </div>
+    <p class="bloque-nota">
+      El aforo cambia de golpe, no de forma continua: sube uno cuando alguien entra
+      y baja uno cuando alguien sale. Por eso la línea va en escalones.
+    </p>
+    <div class="lienzo" id="lienzo-aforo">
+      <svg id="svg-aforo" viewBox="0 0 1000 320" role="img"
+           aria-label="Aforo a lo largo de 79 segundos: sube a un pico de 6 personas a los 27.8 segundos y cierra en 3."></svg>
+      <div class="globo" id="globo-aforo"></div>
+    </div>
+  </section>
+
+  <section class="bloque">
+    <div class="bloque-cab">
+      <h2>Flujo por bloques de 10 segundos</h2>
+      <span class="leyenda">
+        <span><i class="punto e"></i>Entradas</span>
+        <span><i class="punto s"></i>Salidas</span>
+      </span>
+    </div>
+    <p class="bloque-nota">
+      Arriba del eje, quien entra; abajo, quien sale. El bloque de 20&ndash;30 s
+      concentra cuatro llegadas seguidas y ninguna salida.
+    </p>
+    <div class="lienzo" id="lienzo-flujo">
+      <svg id="svg-flujo" viewBox="0 0 1000 260" role="img"
+           aria-label="Entradas y salidas por bloques de diez segundos, en barras divergentes desde un eje central."></svg>
+      <div class="globo" id="globo-flujo"></div>
+    </div>
+  </section>
+
+  <section class="bloque">
+    <div class="bloque-cab"><h2>Bitácora de cruces</h2></div>
+    <p class="bloque-nota">
+      Un renglón por cruce detectado, tal como sale de <code>salida/conteo.csv</code>.
+      El ID es el número que el seguimiento le asignó a esa persona.
+    </p>
+    <div class="tabla-caja">
+      <table>
+        <thead>
+          <tr><th>Segundo</th><th>Dirección</th><th>ID</th><th>Aforo tras el cruce</th></tr>
+        </thead>
+        <tbody id="cuerpo-bitacora"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <span>Proyecto <a href="https://github.com/joseeangel0/passerby-tracker">passerby-tracker</a></span>
+    <span>Video de muestra de OpenCV</span>
+    <span>23 cruces &middot; 18 personas distintas</span>
+  </footer>
+
+</div>
+
+<script>
+// [segundo, 1=entra 0=sale, id de seguimiento, aforo tras el cruce]
+const DATOS = [[2.3,1,2,1],[3.4,1,3,2],[11.3,0,18,1],[17.2,1,24,2],[21.4,1,15,3],
+[24.4,1,26,4],[27.3,1,38,5],[27.8,1,40,6],[32.4,0,26,5],[34.5,0,15,4],[36.2,0,40,3],
+[47.7,0,50,2],[48.2,1,52,3],[52.7,1,58,4],[55.3,1,55,5],[60.0,0,70,4],[63.2,1,72,5],
+[68.4,1,82,6],[69.4,0,78,5],[71.8,0,55,4],[75.0,1,84,5],[75.9,0,72,4],[79.4,0,87,3]];
+
+const FIN = 79.4, TOPE = 7;
+const svgns = "http://www.w3.org/2000/svg";
+
+function el(tag, attrs, texto) {
+  const n = document.createElementNS(svgns, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  if (texto != null) n.textContent = texto;
+  return n;
+}
+
+function globo(caja, nodo, x, y, html) {
+  nodo.innerHTML = html;
+  nodo.classList.add("visible");
+  const ancho = nodo.offsetWidth, alto = nodo.offsetHeight, lim = caja.clientWidth;
+  let izq = x - ancho / 2;
+  izq = Math.max(2, Math.min(izq, lim - ancho - 2));
+  nodo.style.left = izq + "px";
+  nodo.style.top = Math.max(2, y - alto - 12) + "px";
+}
+
+/* ---------- aforo: escalonada con area ---------- */
+(function () {
+  const svg = document.getElementById("svg-aforo");
+  const caja = document.getElementById("lienzo-aforo");
+  const tip = document.getElementById("globo-aforo");
+  const W = 1000, H = 320, L = 46, R = 16, T = 22, B = 40;
+  const px = s => L + (s / FIN) * (W - L - R);
+  const py = v => H - B - (v / TOPE) * (H - T - B);
+
+  for (let v = 0; v <= TOPE; v++) {
+    if (v % 2 !== 0 && v !== TOPE) continue;
+    svg.appendChild(el("line", { x1: L, y1: py(v), x2: W - R, y2: py(v), class: "rejilla" }));
+    svg.appendChild(el("text", { x: L - 10, y: py(v) + 4, class: "eje", "text-anchor": "end" }, v));
+  }
+  for (let s = 0; s <= 75; s += 15) {
+    svg.appendChild(el("text", { x: px(s), y: H - B + 20, class: "eje", "text-anchor": "middle" }, s + "s"));
+  }
+
+  // camino escalonado: el aforo se mantiene hasta el siguiente cruce
+  let d = `M ${px(0)} ${py(0)}`, prev = 0;
+  for (const [s, , , a] of DATOS) { d += ` L ${px(s)} ${py(prev)} L ${px(s)} ${py(a)}`; prev = a; }
+  d += ` L ${px(FIN)} ${py(prev)}`;
+
+  svg.appendChild(el("path", {
+    d: d + ` L ${px(FIN)} ${py(0)} L ${px(0)} ${py(0)} Z`,
+    fill: "var(--entra-fill)", stroke: "none"
+  }));
+  svg.appendChild(el("path", {
+    d: d, fill: "none", stroke: "var(--ink)", "stroke-width": 2,
+    "stroke-linejoin": "round", "stroke-linecap": "round"
+  }));
+  svg.appendChild(el("line", { x1: L, y1: py(0), x2: W - R, y2: py(0), class: "base" }));
+
+  // pico marcado
+  const pico = DATOS.find(p => p[3] === 6);
+  svg.appendChild(el("circle", {
+    cx: px(pico[0]), cy: py(6), r: 5, fill: "var(--ink)",
+    stroke: "var(--surface)", "stroke-width": 2
+  }));
+  svg.appendChild(el("text", {
+    x: px(pico[0]) + 12, y: py(6) - 6, class: "eje",
+    fill: "var(--ink)", "font-weight": 600
+  }, "pico 6"));
+
+  // puntos por cruce, coloreados por direccion
+  for (const [s, t, id, a] of DATOS) {
+    svg.appendChild(el("circle", {
+      cx: px(s), cy: py(a), r: 3.5,
+      fill: t ? "var(--entra)" : "var(--sale)",
+      stroke: "var(--surface)", "stroke-width": 1.5
+    }));
+  }
+
+  const cruz = el("line", { y1: T, y2: H - B, stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "3 3", opacity: 0 });
+  svg.appendChild(cruz);
+
+  const zona = el("rect", { x: L, y: T, width: W - L - R, height: H - T - B, fill: "transparent" });
+  svg.appendChild(zona);
+
+  zona.addEventListener("pointermove", ev => {
+    const r = svg.getBoundingClientRect();
+    const s = ((ev.clientX - r.left) / r.width * W - L) / (W - L - R) * FIN;
+    let cur = null;
+    for (const p of DATOS) { if (p[0] <= s) cur = p; else break; }
+    const aforo = cur ? cur[3] : 0;
+    cruz.setAttribute("x1", px(Math.max(0, Math.min(s, FIN))));
+    cruz.setAttribute("x2", px(Math.max(0, Math.min(s, FIN))));
+    cruz.setAttribute("opacity", 1);
+    const cx = (px(Math.max(0, Math.min(s, FIN))) / W) * r.width;
+    globo(caja, tip, cx, (py(aforo) / H) * r.height,
+      `<b>${aforo}</b> dentro<br>${s.toFixed(1)} s`);
+  });
+  zona.addEventListener("pointerleave", () => {
+    cruz.setAttribute("opacity", 0);
+    tip.classList.remove("visible");
+  });
+})();
+
+/* ---------- flujo: barras divergentes ---------- */
+(function () {
+  const svg = document.getElementById("svg-flujo");
+  const caja = document.getElementById("lienzo-flujo");
+  const tip = document.getElementById("globo-flujo");
+  const W = 1000, H = 260, L = 46, R = 16, T = 18, B = 34;
+  const cero = (H - T - B) / 2 + T;
+  const MAXV = 4;
+  const alto = v => (v / MAXV) * (cero - T - 14);
+
+  const bloques = [];
+  for (let b = 0; b < 8; b++) {
+    const dentro = DATOS.filter(p => p[0] >= b * 10 && p[0] < (b + 1) * 10);
+    bloques.push({ b, e: dentro.filter(p => p[1]).length, s: dentro.filter(p => !p[1]).length });
+  }
+
+  const paso = (W - L - R) / 8, ancho = paso * 0.52;
+
+  for (const v of [2, 4]) {
+    for (const signo of [1, -1]) {
+      svg.appendChild(el("line", {
+        x1: L, y1: cero - signo * alto(v), x2: W - R, y2: cero - signo * alto(v), class: "rejilla"
+      }));
+      svg.appendChild(el("text", {
+        x: L - 10, y: cero - signo * alto(v) + 4, class: "eje", "text-anchor": "end"
+      }, v));
+    }
+  }
+
+  bloques.forEach(({ b, e, s }) => {
+    const cx = L + paso * b + paso / 2;
+    // 2px de separacion contra la linea cero, arriba y abajo
+    if (e) {
+      const h = alto(e);
+      svg.appendChild(el("rect", {
+        x: cx - ancho / 2, y: cero - 1 - h, width: ancho, height: h,
+        fill: "var(--entra)", rx: 4
+      }));
+      svg.appendChild(el("text", {
+        x: cx, y: cero - 7 - h, class: "eje", "text-anchor": "middle",
+        fill: "var(--ink)", "font-weight": 600
+      }, e));
+    }
+    if (s) {
+      const h = alto(s);
+      svg.appendChild(el("rect", {
+        x: cx - ancho / 2, y: cero + 1, width: ancho, height: h,
+        fill: "var(--sale)", rx: 4
+      }));
+      svg.appendChild(el("text", {
+        x: cx, y: cero + h + 16, class: "eje", "text-anchor": "middle",
+        fill: "var(--ink)", "font-weight": 600
+      }, s));
+    }
+    svg.appendChild(el("text", {
+      x: cx, y: H - B + 22, class: "eje", "text-anchor": "middle"
+    }, `${b * 10}–${b * 10 + 10}`));
+
+    const golpe = el("rect", { x: L + paso * b, y: T, width: paso, height: H - T - B, fill: "transparent" });
+    golpe.style.cursor = "crosshair";
+    golpe.addEventListener("pointerenter", () => {
+      const r = svg.getBoundingClientRect();
+      globo(caja, tip, (cx / W) * r.width, (cero / H) * r.height - 18,
+        `<b>${b * 10}–${b * 10 + 10} s</b><br>${e} entraron &middot; ${s} salieron`);
+    });
+    golpe.addEventListener("pointerleave", () => tip.classList.remove("visible"));
+    svg.appendChild(golpe);
+  });
+
+  svg.appendChild(el("line", { x1: L, y1: cero, x2: W - R, y2: cero, class: "base" }));
+})();
+
+/* ---------- bitacora ---------- */
+(function () {
+  const cuerpo = document.getElementById("cuerpo-bitacora");
+  for (const [s, t, id, a] of DATOS) {
+    const tr = document.createElement("tr");
+    tr.innerHTML =
+      `<td class="num">${s.toFixed(1)} s</td>` +
+      `<td><span class="marca-dir ${t ? "e" : "s"}">` +
+      `<span class="flecha">${t ? "→" : "←"}</span>${t ? "Entró" : "Salió"}</span></td>` +
+      `<td class="num">#${id}</td>` +
+      `<td class="num">${a}</td>`;
+    cuerpo.appendChild(tr);
+  }
+})();
+</script>
