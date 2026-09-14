@@ -1,0 +1,666 @@
+<title>Aforo en Puerta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+:root {
+  --plane:      #eef0f1;
+  --surface:    #fafbfb;
+  --surface-2:  #f3f5f6;
+  --ink:        #0e1214;
+  --ink-2:      #4e5559;
+  --muted:      #868d91;
+  --grid:       #dfe3e4;
+  --rule:       #ccd2d4;
+  --entra:      #1baf7a;
+  --sale:       #eb6834;
+  --entra-fill: rgba(27, 175, 122, .16);
+  --brass:      #a37430;
+  --on-ink:     #eef0f1;
+  --on-ink-2:   rgba(238,240,241,.66);
+  --shadow:     0 1px 2px rgba(14,18,20,.06), 0 8px 24px -12px rgba(14,18,20,.18);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --plane:      #101314;
+    --surface:    #191d1f;
+    --surface-2:  #1f2426;
+    --ink:        #f4f6f6;
+    --ink-2:      #b4bbbe;
+    --muted:      #7e868a;
+    --grid:       #2a2f32;
+    --rule:       #333a3d;
+    --entra:      #199e70;
+    --sale:       #d95926;
+    --entra-fill: rgba(25, 158, 112, .20);
+    --brass:      #c99a4e;
+    --on-ink:     #101314;
+    --on-ink-2:   rgba(16,19,20,.62);
+    --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"] {
+  --plane:      #101314;
+  --surface:    #191d1f;
+  --surface-2:  #1f2426;
+  --ink:        #f4f6f6;
+  --ink-2:      #b4bbbe;
+  --muted:      #7e868a;
+  --grid:       #2a2f32;
+  --rule:       #333a3d;
+  --entra:      #199e70;
+  --sale:       #d95926;
+  --entra-fill: rgba(25, 158, 112, .20);
+  --brass:      #c99a4e;
+  --on-ink:     #101314;
+  --on-ink-2:   rgba(16,19,20,.62);
+  --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--plane);
+  color: var(--ink);
+  font-family: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+.envoltura {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px 24px 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* ---------- cabecera ---------- */
+
+.cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px 32px;
+  padding-bottom: 22px;
+  border-bottom: 2px solid var(--ink);
+}
+.eyebrow {
+  display: block;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin-bottom: 8px;
+}
+h1 {
+  font-family: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(2.1rem, 5.4vw, 3.1rem);
+  line-height: .98;
+  letter-spacing: -.025em;
+  margin: 0;
+  text-wrap: balance;
+}
+.sub {
+  margin: 10px 0 0;
+  color: var(--ink-2);
+  font-size: 1.02rem;
+  max-width: 46ch;
+}
+.ficha {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 3px 18px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.ficha dt { text-transform: uppercase; letter-spacing: .07em; }
+.ficha dd { margin: 0; color: var(--ink-2); text-align: right; }
+
+/* ---------- aviso de procedencia ---------- */
+
+.aviso {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  padding: 13px 16px;
+  background: var(--surface-2);
+  border-left: 3px solid var(--brass);
+  border-radius: 0 4px 4px 0;
+  font-size: .92rem;
+  color: var(--ink-2);
+}
+.aviso b { color: var(--ink); font-weight: 600; }
+
+/* ---------- cifras ---------- */
+
+.cifras {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px;
+}
+.cifra {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  padding: 18px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cifra.destacada {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--on-ink);
+  box-shadow: var(--shadow);
+}
+.cifra-etq {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.cifra.destacada .cifra-etq { color: var(--on-ink-2); }
+.punto { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.punto.e { background: var(--entra); }
+.punto.s { background: var(--sale); }
+.cifra-num {
+  font-family: "Bricolage Grotesque", ui-sans-serif, sans-serif;
+  font-size: 2.85rem;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums;
+}
+.cifra-pie { font-size: .84rem; color: var(--muted); }
+.cifra.destacada .cifra-pie { color: var(--on-ink-2); }
+
+/* ---------- bloques de grafica ---------- */
+
+.bloque {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  padding: 22px 24px 18px;
+}
+.bloque-cab {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 20px;
+  margin-bottom: 4px;
+}
+h2 {
+  font-family: "Bricolage Grotesque", ui-sans-serif, sans-serif;
+  font-size: 1.22rem;
+  font-weight: 700;
+  letter-spacing: -.015em;
+  margin: 0;
+}
+.bloque-nota { font-size: .88rem; color: var(--muted); margin: 0 0 18px; max-width: 62ch; }
+.leyenda {
+  display: flex;
+  gap: 16px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+
+.lienzo { position: relative; }
+.lienzo svg { display: block; width: 100%; height: auto; overflow: visible; }
+.eje { fill: var(--muted); font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 11px; }
+.rejilla { stroke: var(--grid); stroke-width: 1; }
+.base { stroke: var(--rule); stroke-width: 1.5; }
+
+.globo {
+  position: absolute;
+  pointer-events: none;
+  background: var(--ink);
+  color: var(--on-ink);
+  padding: 7px 11px;
+  border-radius: 4px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11.5px;
+  line-height: 1.5;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity .12s;
+  z-index: 5;
+  box-shadow: var(--shadow);
+}
+.globo.visible { opacity: 1; }
+.globo b { font-weight: 600; }
+
+/* ---------- bitacora ---------- */
+
+.tabla-caja { overflow-x: auto; margin-top: 4px; }
+table { border-collapse: collapse; width: 100%; min-width: 460px; font-size: .92rem; }
+th {
+  text-align: left;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0 14px 9px 0;
+  border-bottom: 1px solid var(--rule);
+}
+td {
+  padding: 8px 14px 8px 0;
+  border-bottom: 1px solid var(--grid);
+  font-variant-numeric: tabular-nums;
+}
+td.num { font-family: "IBM Plex Mono", ui-monospace, monospace; color: var(--ink-2); }
+tbody tr:hover { background: var(--surface-2); }
+.marca-dir {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+  font-size: .88rem;
+}
+.marca-dir.e { color: var(--entra); }
+.marca-dir.s { color: var(--sale); }
+.flecha { font-family: "IBM Plex Mono", monospace; }
+
+footer {
+  border-top: 1px solid var(--rule);
+  padding-top: 18px;
+  font-size: .86rem;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+}
+footer a { color: var(--ink-2); text-decoration-color: var(--rule); text-underline-offset: 3px; }
+footer a:hover { color: var(--ink); }
+
+:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; border-radius: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+@media (max-width: 560px) {
+  .envoltura { padding: 28px 16px 56px; gap: 24px; }
+  .bloque { padding: 18px 16px 14px; }
+  .cifra-num { font-size: 2.4rem; }
+}
+
+/* ---------- controles interactivos ---------- */
+.controles {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto auto auto;
+  gap: 12px;
+  align-items: end;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+}
+.control { display:flex; flex-direction:column; gap:5px; }
+.control label {
+  font-family:"IBM Plex Mono",monospace;
+  font-size:10.5px; font-weight:600; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--muted);
+}
+.control input, .control select, .boton {
+  min-height:38px; border:1px solid var(--rule); border-radius:4px;
+  background:var(--surface-2); color:var(--ink); padding:7px 10px;
+  font:inherit;
+}
+.control input[type="range"] { padding:0; accent-color:var(--entra); }
+.rango { grid-column:1 / -1; }
+.rango-linea { display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center; }
+.rango-val { font-family:"IBM Plex Mono",monospace; font-size:12px; min-width:58px; }
+.boton { cursor:pointer; font-weight:600; }
+.boton:hover { border-color:var(--ink); }
+.toggle { display:inline-flex; align-items:center; gap:8px; min-height:38px; }
+.toggle input { accent-color:var(--brass); }
+.cifra.interactiva { cursor:pointer; transition:transform .15s, border-color .15s; }
+.cifra.interactiva:hover { transform:translateY(-2px); border-color:var(--brass); }
+.cifra.activa { outline:2px solid var(--brass); outline-offset:2px; }
+tr.seleccionada { background:var(--entra-fill)!important; outline:1px solid var(--entra); outline-offset:-1px; cursor:pointer; }
+tbody tr { cursor:pointer; }
+.punto-evento { cursor:pointer; }
+.bar-evento { cursor:pointer; transition:opacity .12s; }
+.bar-evento:hover, .punto-evento:hover { opacity:.65; }
+.resumen-filtro {
+  margin-top:8px; font-family:"IBM Plex Mono",monospace; font-size:11px;
+  color:var(--muted);
+}
+@media(max-width:800px){
+  .controles { grid-template-columns:1fr 1fr; }
+  .rango { grid-column:1/-1; }
+}
+@media(max-width:560px){
+  .controles { grid-template-columns:1fr; }
+  .rango { grid-column:1; }
+}
+
+</style>
+
+<div class="envoltura">
+
+  <header class="cabecera">
+    <div>
+      <span class="eyebrow">Panel de servicio</span>
+      <h1>Aforo en Puerta</h1>
+      <p class="sub">Conteo automático de comensales que cruzan la entrada, con dirección.</p>
+    </div>
+    <dl class="ficha">
+      <dt>Ventana</dt><dd>79.4 s</dd>
+      <dt>Detector</dt><dd>YOLO11-nano</dd>
+      <dt>Seguimiento</dt><dd>ByteTrack</dd>
+      <dt>Proceso</dt><dd>42 fps</dd>
+    </dl>
+  </header>
+
+  <p class="aviso">
+    <b>Demostración.</b>
+    <span>Los cruces son reales, medidos por el sistema sobre el video de prueba
+    <code>vtest.avi</code> (79 s). El encuadre de restaurante es una simulación:
+    la dirección hacia el interior se asignó al calibrar la línea. Ninguna cifra
+    proviene de un local real.</span>
+  </p>
+
+
+  <section class="controles" aria-label="Controles interactivos">
+    <div class="control rango">
+      <label for="slider-tiempo">Ventana de tiempo</label>
+      <div class="rango-linea">
+        <span class="rango-val" id="rango-inicio">0.0 s</span>
+        <input id="slider-tiempo" type="range" min="0" max="79.4" step="0.1" value="79.4">
+        <span class="rango-val" id="rango-fin">79.4 s</span>
+      </div>
+    </div>
+    <div class="control">
+      <label for="filtro-direccion">Dirección</label>
+      <select id="filtro-direccion">
+        <option value="ambos">Ambas</option>
+        <option value="entra">Entradas</option>
+        <option value="sale">Salidas</option>
+      </select>
+    </div>
+    <div class="control">
+      <label for="filtro-id">ID de seguimiento</label>
+      <select id="filtro-id"><option value="todos">Todos</option></select>
+    </div>
+    <button class="boton" id="limpiar-filtros" type="button">Limpiar filtros</button>
+    <label class="toggle">
+      <input id="tema-toggle" type="checkbox">
+      <span>Modo oscuro</span>
+    </label>
+  </section>
+
+  <section class="cifras" aria-label="Resumen del periodo">
+    <div class="cifra interactiva" id="kpi-entradas">
+      <span class="cifra-etq"><i class="punto e"></i>Entraron</span>
+      <span class="cifra-num" id="kpi-entradas-num" style="color:var(--entra)">13</span>
+      <span class="cifra-pie">en el filtro actual</span>
+    </div>
+    <div class="cifra interactiva" id="kpi-salidas">
+      <span class="cifra-etq"><i class="punto s"></i>Salieron</span>
+      <span class="cifra-num" id="kpi-salidas-num" style="color:var(--sale)">10</span>
+      <span class="cifra-pie">en el filtro actual</span>
+    </div>
+    <div class="cifra destacada">
+      <span class="cifra-etq">Dentro al cierre</span>
+      <span class="cifra-num" id="kpi-aforo">3</span>
+      <span class="cifra-pie" id="kpi-pico">pico de 6 a los 27.8 s</span>
+    </div>
+    <div class="cifra">
+      <span class="cifra-etq">Eventos filtrados</span>
+      <span class="cifra-num" id="kpi-eventos">23</span>
+      <span class="cifra-pie" id="kpi-personas">18 IDs distintos</span>
+    </div>
+  </section>
+
+  <section class="bloque">
+    <div class="bloque-cab">
+      <h2>Aforo a lo largo del servicio</h2>
+      <span class="leyenda"><span>Escalón por cada cruce</span></span>
+    </div>
+    <p class="bloque-nota">
+      El aforo cambia de golpe, no de forma continua: sube uno cuando alguien entra
+      y baja uno cuando alguien sale. Por eso la línea va en escalones.
+    </p>
+    <div class="lienzo" id="lienzo-aforo">
+      <svg id="svg-aforo" viewBox="0 0 1000 320" role="img"
+           aria-label="Aforo a lo largo de 79 segundos: sube a un pico de 6 personas a los 27.8 segundos y cierra en 3."></svg>
+      <div class="globo" id="globo-aforo"></div>
+    </div>
+  </section>
+
+  <section class="bloque">
+    <div class="bloque-cab">
+      <h2>Flujo por bloques de 10 segundos</h2>
+      <span class="leyenda">
+        <span><i class="punto e"></i>Entradas</span>
+        <span><i class="punto s"></i>Salidas</span>
+      </span>
+    </div>
+    <p class="bloque-nota">
+      Arriba del eje, quien entra; abajo, quien sale. El bloque de 20&ndash;30 s
+      concentra cuatro llegadas seguidas y ninguna salida.
+    </p>
+    <div class="lienzo" id="lienzo-flujo">
+      <svg id="svg-flujo" viewBox="0 0 1000 260" role="img"
+           aria-label="Entradas y salidas por bloques de diez segundos, en barras divergentes desde un eje central."></svg>
+      <div class="globo" id="globo-flujo"></div>
+    </div>
+  </section>
+
+  <section class="bloque">
+    <div class="bloque-cab">
+      <h2>Bitácora de cruces</h2>
+      <button class="boton" id="exportar-csv" type="button">Exportar CSV</button>
+    </div>
+    <p class="bloque-nota">
+      Un renglón por cruce detectado, tal como sale de <code>salida/conteo.csv</code>.
+      El ID es el número que el seguimiento le asignó a esa persona.
+    </p>
+    <div class="tabla-caja">
+      <table>
+        <thead>
+          <tr><th>Segundo</th><th>Dirección</th><th>ID</th><th>Aforo tras el cruce</th></tr>
+        </thead>
+        <tbody id="cuerpo-bitacora"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <span>Proyecto <a href="https://github.com/joseeangel0/passerby-tracker">passerby-tracker</a></span>
+    <span>Video de muestra de OpenCV</span>
+    <span>23 cruces &middot; 18 personas distintas</span>
+  </footer>
+
+</div>
+
+<script>
+const DATOS = [[2.3,1,2,1],[3.4,1,3,2],[11.3,0,18,1],[17.2,1,24,2],[21.4,1,15,3],
+[24.4,1,26,4],[27.3,1,38,5],[27.8,1,40,6],[32.4,0,26,5],[34.5,0,15,4],[36.2,0,40,3],
+[47.7,0,50,2],[48.2,1,52,3],[52.7,1,58,4],[55.3,1,55,5],[60.0,0,70,4],[63.2,1,72,5],
+[68.4,1,82,6],[69.4,0,78,5],[71.8,0,55,4],[75.0,1,84,5],[75.9,0,72,4],[79.4,0,87,3]];
+const FIN = 79.4, TOPE = 7, svgns = "http://www.w3.org/2000/svg";
+const state = { start:0, end:FIN, dir:"ambos", id:"todos", selected:null };
+
+function el(tag, attrs, texto) {
+  const n=document.createElementNS(svgns,tag);
+  for(const k in attrs)n.setAttribute(k,attrs[k]);
+  if(texto!=null)n.textContent=texto;
+  return n;
+}
+function filtered(){
+  return DATOS.filter(p=>p[0]>=state.start && p[0]<=state.end &&
+    (state.dir==="ambos" || (state.dir==="entra" && p[1]===1) || (state.dir==="sale" && p[1]===0)) &&
+    (state.id==="todos" || String(p[2])===state.id));
+}
+function occupancyAt(t){
+  let a=0;
+  for(const p of DATOS){ if(p[0]<=t)a=p[3]; else break; }
+  return a;
+}
+function tooltip(caja, tip, x, y, text){
+  tip.innerHTML=text; tip.classList.add("visible");
+  const w=tip.offsetWidth,h=tip.offsetHeight,lim=caja.clientWidth;
+  let left=x-w/2; left=Math.max(2,Math.min(left,lim-w-2));
+  tip.style.left=left+"px"; tip.style.top=Math.max(2,y-h-12)+"px";
+}
+function clearSvg(id){ document.getElementById(id).replaceChildren(); }
+
+function drawAforo(){
+  const svg=document.getElementById("svg-aforo"), caja=document.getElementById("lienzo-aforo"), tip=document.getElementById("globo-aforo");
+  clearSvg("svg-aforo");
+  const W=1000,H=320,L=46,R=16,T=22,B=40;
+  const px=s=>L+(s/FIN)*(W-L-R), py=v=>H-B-(v/TOPE)*(H-T-B);
+  for(let v=0;v<=TOPE;v++){if(v%2!==0&&v!==TOPE)continue;
+    svg.appendChild(el("line",{x1:L,y1:py(v),x2:W-R,y2:py(v),class:"rejilla"}));
+    svg.appendChild(el("text",{x:L-10,y:py(v)+4,class:"eje","text-anchor":"end"},v));
+  }
+  for(let s=0;s<=75;s+=15)svg.appendChild(el("text",{x:px(s),y:H-B+20,class:"eje","text-anchor":"middle"},s+"s"));
+
+  let d=`M ${px(0)} ${py(0)}`,prev=0;
+  for(const [s,,id,a] of DATOS){d+=` L ${px(s)} ${py(prev)} L ${px(s)} ${py(a)}`;prev=a;}
+  d+=` L ${px(FIN)} ${py(prev)}`;
+  svg.appendChild(el("path",{d:d+` L ${px(FIN)} ${py(0)} L ${px(0)} ${py(0)} Z`,fill:"var(--entra-fill)",stroke:"none"}));
+  svg.appendChild(el("path",{d,fill:"none",stroke:"var(--ink)","stroke-width":2,"stroke-linejoin":"round","stroke-linecap":"round"}));
+  svg.appendChild(el("line",{x1:L,y1:py(0),x2:W-R,y2:py(0),class:"base"}));
+
+  const pico=Math.max(...DATOS.map(p=>p[3])), picoP=DATOS.find(p=>p[3]===pico);
+  svg.appendChild(el("circle",{cx:px(picoP[0]),cy:py(pico),r:5,fill:"var(--ink)",stroke:"var(--surface)","stroke-width":2}));
+  svg.appendChild(el("text",{x:px(picoP[0])+12,y:py(pico)-6,class:"eje","font-weight":600},"pico "+pico));
+
+  DATOS.forEach((p,i)=>{
+    const [s,t,id,a]=p, visible=s>=state.start&&s<=state.end&&(state.dir==="ambos"||(state.dir==="entra"&&t)||(state.dir==="sale"&&!t))&&(state.id==="todos"||String(id)===state.id);
+    const c=el("circle",{cx:px(s),cy:py(a),r:visible?5:2.5,fill:t?"var(--entra)":"var(--sale)",stroke:"var(--surface)","stroke-width":1.5,opacity:visible?1:.16,class:"punto-evento"});
+    c.addEventListener("click",()=>selectEvent(i));
+    c.addEventListener("pointerenter",ev=>{
+      const r=svg.getBoundingClientRect();
+      tooltip(caja,tip,(px(s)/W)*r.width,(py(a)/H)*r.height,`<b>${s.toFixed(1)} s</b><br>${t?"Entró":"Salió"} · ID #${id}<br>Aforo: ${a}`);
+    });
+    c.addEventListener("pointerleave",()=>tip.classList.remove("visible"));
+    svg.appendChild(c);
+  });
+}
+function drawFlujo(){
+  const svg=document.getElementById("svg-flujo"), caja=document.getElementById("lienzo-flujo"), tip=document.getElementById("globo-flujo");
+  clearSvg("svg-flujo");
+  const W=1000,H=260,L=46,R=16,T=18,B=34,cero=(H-T-B)/2+T,MAXV=4;
+  const alto=v=>(v/MAXV)*(cero-T-14), paso=(W-L-R)/8,ancho=paso*.52;
+  for(const v of [2,4])for(const signo of [1,-1]){
+    svg.appendChild(el("line",{x1:L,y1:cero-signo*alto(v),x2:W-R,y2:cero-signo*alto(v),class:"rejilla"}));
+    svg.appendChild(el("text",{x:L-10,y:cero-signo*alto(v)+4,class:"eje","text-anchor":"end"},v));
+  }
+  for(let b=0;b<8;b++){
+    const rows=DATOS.filter(p=>p[0]>=b*10&&p[0]<(b+1)*10);
+    const e=rows.filter(p=>p[1]).length,s=rows.filter(p=>!p[1]).length,cx=L+paso*b+paso/2;
+    if(e){const h=alto(e),r=el("rect",{x:cx-ancho/2,y:cero-1-h,width:ancho,height:h,fill:"var(--entra)",rx:4,class:"bar-evento"});
+      r.addEventListener("click",()=>setTimeRange(b*10,Math.min((b+1)*10,FIN)));
+      svg.appendChild(r);svg.appendChild(el("text",{x:cx,y:cero-7-h,class:"eje","text-anchor":"middle","font-weight":600},e));
+    }
+    if(s){const h=alto(s),r=el("rect",{x:cx-ancho/2,y:cero+1,width:ancho,height:h,fill:"var(--sale)",rx:4,class:"bar-evento"});
+      r.addEventListener("click",()=>setTimeRange(b*10,Math.min((b+1)*10,FIN)));
+      svg.appendChild(r);svg.appendChild(el("text",{x:cx,y:cero+h+16,class:"eje","text-anchor":"middle","font-weight":600},s));
+    }
+    svg.appendChild(el("text",{x:cx,y:H-B+22,class:"eje","text-anchor":"middle"},`${b*10}–${Math.min(b*10+10,FIN).toFixed(0)}`));
+    const golpe=el("rect",{x:L+paso*b,y:T,width:paso,height:H-T-B,fill:"transparent"});
+    golpe.style.cursor="crosshair";
+    golpe.addEventListener("pointerenter",ev=>{const r=svg.getBoundingClientRect();tooltip(caja,tip,(cx/W)*r.width,(cero/H)*r.height-18,`<b>${b*10}–${Math.min(b*10+10,FIN).toFixed(0)} s</b><br>${e} entradas · ${s} salidas`)});
+    golpe.addEventListener("pointerleave",()=>tip.classList.remove("visible"));
+    svg.appendChild(golpe);
+  }
+  svg.appendChild(el("line",{x1:L,y1:cero,x2:W-R,y2:cero,class:"base"}));
+}
+function renderTable(){
+  const body=document.getElementById("cuerpo-bitacora"); body.replaceChildren();
+  filtered().forEach((p)=>{
+    const [s,t,id,a]=p,i=DATOS.indexOf(p),tr=document.createElement("tr");
+    tr.dataset.index=i;
+    tr.innerHTML=`<td class="num">${s.toFixed(1)} s</td><td><span class="marca-dir ${t?"e":"s"}"><span class="flecha">${t?"→":"←"}</span>${t?"Entró":"Salió"}</span></td><td class="num">#${id}</td><td class="num">${a}</td>`;
+    if(i===state.selected)tr.classList.add("seleccionada");
+    tr.addEventListener("click",()=>selectEvent(i));
+    body.appendChild(tr);
+  });
+}
+function updateKPIs(){
+  const rows=filtered(), entradas=rows.filter(p=>p[1]).length,salidas=rows.length-entradas;
+  document.getElementById("kpi-entradas-num").textContent=entradas;
+  document.getElementById("kpi-salidas-num").textContent=salidas;
+  document.getElementById("kpi-eventos").textContent=rows.length;
+  document.getElementById("kpi-personas").textContent=new Set(rows.map(p=>p[2])).size+" IDs distintos";
+  const cierre=occupancyAt(state.end), max=Math.max(0,...DATOS.filter(p=>p[0]>=state.start&&p[0]<=state.end).map(p=>p[3]));
+  document.getElementById("kpi-aforo").textContent=cierre;
+  document.getElementById("kpi-pico").textContent=max?`pico de ${max} en el rango`:"sin cruces en el rango";
+}
+function selectEvent(i){
+  state.selected=i;
+  const p=DATOS[i];
+  state.start=Math.max(0,p[0]-2);state.end=Math.min(FIN,p[0]+2);
+  document.getElementById("slider-tiempo").value=state.end;
+  document.getElementById("rango-inicio").textContent=state.start.toFixed(1)+" s";
+  document.getElementById("rango-fin").textContent=state.end.toFixed(1)+" s";
+  renderAll();
+  requestAnimationFrame(()=>document.querySelector(`tr[data-index="${i}"]`)?.scrollIntoView({block:"nearest"}));
+}
+function setTimeRange(start,end){
+  state.start=start;state.end=end;state.selected=null;
+  document.getElementById("slider-tiempo").value=end;
+  document.getElementById("rango-inicio").textContent=start.toFixed(1)+" s";
+  document.getElementById("rango-fin").textContent=end.toFixed(1)+" s";
+  renderAll();
+}
+function renderAll(){drawAforo();drawFlujo();renderTable();updateKPIs();}
+function populateIds(){
+  const sel=document.getElementById("filtro-id");
+  [...new Set(DATOS.map(p=>p[2]))].sort((a,b)=>a-b).forEach(id=>{const o=document.createElement("option");o.value=id;o.textContent="#"+id;sel.appendChild(o);});
+}
+document.getElementById("slider-tiempo").addEventListener("input",e=>{
+  state.end=+e.target.value;
+  if(state.end<state.start)state.start=state.end;
+  document.getElementById("rango-inicio").textContent=state.start.toFixed(1)+" s";
+  document.getElementById("rango-fin").textContent=state.end.toFixed(1)+" s";
+  state.selected=null;renderAll();
+});
+document.getElementById("filtro-direccion").addEventListener("change",e=>{state.dir=e.target.value;state.selected=null;renderAll()});
+document.getElementById("filtro-id").addEventListener("change",e=>{state.id=e.target.value;state.selected=null;renderAll()});
+document.getElementById("limpiar-filtros").addEventListener("click",()=>{
+  state.start=0;state.end=FIN;state.dir="ambos";state.id="todos";state.selected=null;
+  document.getElementById("slider-tiempo").value=FIN;
+  document.getElementById("filtro-direccion").value="ambos";document.getElementById("filtro-id").value="todos";
+  document.getElementById("rango-inicio").textContent="0.0 s";document.getElementById("rango-fin").textContent=FIN+" s";renderAll();
+});
+document.getElementById("kpi-entradas").addEventListener("click",()=>{state.dir="entra";document.getElementById("filtro-direccion").value="entra";renderAll()});
+document.getElementById("kpi-salidas").addEventListener("click",()=>{state.dir="sale";document.getElementById("filtro-direccion").value="sale";renderAll()});
+document.getElementById("exportar-csv").addEventListener("click",()=>{
+  const rows=filtered(), csv=["Segundo,Direccion,ID,Aforo tras el cruce",...rows.map(p=>`${p[0].toFixed(1)},"${p[1]?"Entró":"Salió"}",${p[2]},${p[3]}`)].join("\n");
+  const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);a.download="aforo_filtrado.csv";a.click();URL.revokeObjectURL(a.href);
+});
+const root=document.documentElement, themeToggle=document.getElementById("tema-toggle");
+const savedTheme=localStorage.getItem("aforo-theme");
+if(savedTheme){root.setAttribute("data-theme",savedTheme);themeToggle.checked=savedTheme==="dark";}
+else if(matchMedia("(prefers-color-scheme: dark)").matches)themeToggle.checked=true;
+themeToggle.addEventListener("change",()=>{const t=themeToggle.checked?"dark":"light";root.setAttribute("data-theme",t);localStorage.setItem("aforo-theme",t)});
+populateIds();renderAll();
+</script>
