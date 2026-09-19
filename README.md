@@ -1,66 +1,66 @@
-# Contador de personas por cruce de línea
+# Line-crossing people counter
 
-Cuenta cuántas personas cruzan una línea en un video y **en qué dirección**,
-usando detección de objetos y seguimiento de trayectorias. El caso de uso
-original: medir cuánta gente entra a una tienda.
+Counts how many people cross a line in a video and **in which direction**,
+using object detection and trajectory tracking. The original use case:
+measuring how many people walk into a store.
 
-Proyecto escolar. Todo el código es Python y corre en una laptop, sin GPU.
+School project. All the code is Python and runs on a laptop, no GPU needed.
 
 ---
 
-## Resultado de la prueba
+## Test results
 
-Corrido sobre `videos/vtest.avi` (79 segundos, gente cruzando un patio):
+Run on `videos/vtest.avi` (79 seconds, people crossing a courtyard):
 
 | | |
 |---|---|
-| Cruces izquierda → derecha | 10 |
-| Cruces derecha → izquierda | 13 |
-| Personas distintas detectadas | 18 |
-| Tiempo de proceso | 19 s para 795 frames (~42 fps) |
+| Left → right crossings | 10 |
+| Right → left crossings | 13 |
+| Distinct people detected | 18 |
+| Processing time | 19 s for 795 frames (~42 fps) |
 
-El video anotado está en [`salida/resultado.mp4`](salida/resultado.mp4) y los
-datos crudos en [`salida/conteo.csv`](salida/conteo.csv), con un renglón por
-cruce y el segundo exacto en que ocurrió.
+The annotated video is in [`salida/resultado.mp4`](salida/resultado.mp4) and
+the raw data in [`salida/conteo.csv`](salida/conteo.csv), with one row per
+crossing and the exact second it happened.
 
-**Estos números no están validados.** Nadie contó a mano ese video, así que
-son lo que el sistema reporta, no necesariamente lo que pasó. Ver
-[Validación](#validación).
-
----
-
-## Cómo funciona
-
-1. **Detección.** YOLO11-nano encuentra personas en cada frame. Se filtra a la
-   clase `person` (clase 0 de COCO) y se ignora todo lo demás.
-
-2. **Seguimiento.** ByteTrack le asigna un ID estable a cada persona para poder
-   seguirla entre frames. Sin esto no se podría saber si dos detecciones en
-   frames distintos son la misma persona.
-
-3. **Punto de referencia.** De cada caja se toma el **centro-inferior** (los
-   pies), no el centro. Es más estable: el centro de la caja se mueve cuando
-   alguien levanta los brazos o cuando se le ocluye la cabeza, los pies no.
-
-4. **Cruce con dirección.** Se calcula de qué lado de la línea cae ese punto
-   usando el producto cruz 2D. Cuando el lado cambia, hubo un cruce, y el signo
-   dice hacia dónde.
-
-### La parte que evita el error más común
-
-Hay una **franja muerta** de `margen_px` píxeles a cada lado de la línea donde
-no se decide nada. Un track solo confirma de qué lado está cuando sale de esa
-franja, y solo se cuenta un cruce cuando el lado confirmado *cambia*.
-
-Sin esto, una persona parada justo sobre la línea haría temblar su caja de
-detección y dispararía decenas de conteos falsos. Es el error clásico de estos
-proyectos.
+**These numbers are not validated.** Nobody counted that video by hand, so
+they are what the system reports, not necessarily what happened. See
+[Validation](#validation).
 
 ---
 
-## Instalación
+## How it works
 
-Requiere Python 3.12 (con 3.14 todavía fallan las ruedas de PyTorch).
+1. **Detection.** YOLO11-nano finds people in every frame. Only the `person`
+   class (COCO class 0) is kept; everything else is ignored.
+
+2. **Tracking.** ByteTrack assigns each person a stable ID so they can be
+   followed across frames. Without it there would be no way to tell whether two
+   detections in different frames are the same person.
+
+3. **Reference point.** For each box we take the **bottom-center** (the feet),
+   not the center. It is more stable: the box center moves when someone raises
+   their arms or their head gets occluded; the feet don't.
+
+4. **Directional crossing.** Which side of the line that point falls on is
+   computed with the 2D cross product. When the side changes, there was a
+   crossing, and the sign tells which way.
+
+### The part that avoids the most common bug
+
+There is a **dead band** of `margen_px` pixels on each side of the line where
+nothing is decided. A track only confirms which side it is on once it leaves
+that band, and a crossing is only counted when the confirmed side *changes*.
+
+Without this, a person standing right on the line would make their detection
+box jitter and trigger dozens of false counts. It's the classic mistake in
+projects like this one.
+
+---
+
+## Installation
+
+Requires Python 3.12 (PyTorch wheels still fail on 3.14).
 
 ```bash
 git clone https://github.com/joseeangel0/passerby-tracker.git
@@ -70,27 +70,27 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-El modelo `yolo11n.pt` (5 MB) se descarga solo la primera vez que corres el
-programa. No está en el repo a propósito.
+The `yolo11n.pt` model (5 MB) downloads automatically the first time you run
+the program. It is intentionally not in the repo.
 
 ---
 
-## Replicar la prueba
+## Reproducing the test
 
-El repo ya trae el video y la configuración listos:
+The repo already ships with the video and configuration ready to go:
 
 ```bash
 python contador.py
 ```
 
-Tarda ~20 segundos y debe darte los mismos 10 y 13. Para ver el resultado:
+It takes ~20 seconds and should give you the same 10 and 13. To see the result:
 
 ```bash
 open salida/resultado.mp4     # macOS
 xdg-open salida/resultado.mp4 # Linux
 ```
 
-Y las pruebas de la lógica de conteo, que no necesitan video ni modelo:
+And the counting-logic tests, which need neither video nor model:
 
 ```bash
 python test_linea.py
@@ -98,32 +98,34 @@ python test_linea.py
 
 ---
 
-## Usarlo con tu propio video
+## Using it with your own video
 
-**1. Define la línea.** Se abre una ventana con un frame del video; haces clic
-en dos puntos sobre la puerta:
+**1. Define the line.** A window opens with a frame from the video; click two
+points across the doorway:
 
 ```bash
-python calibrar.py --video videos/tu_video.mp4
+python calibrar.py --video videos/your_video.mp4
 ```
 
-- La flecha amarilla indica qué lado cuenta como positivo (`entrada`)
-- `i` invierte la dirección · `g` guarda · `r` rehace · `ESC` cancela
-- Si la ventana no abre: `python calibrar.py --video videos/tu_video.mp4 --puntos 640,300,640,900`
+- The yellow arrow shows which side counts as positive (`entrada`, "entry")
+- `i` flips the direction · `g` saves · `r` redo · `ESC` cancels
+- If the window doesn't open: `python calibrar.py --video videos/your_video.mp4 --puntos 640,300,640,900`
 
-Pon la línea **dentro del marco de la puerta** y perpendicular al paso. Mientras
-más lejos de la puerta, más oclusiones y más errores.
+Place the line **inside the door frame** and perpendicular to the walking path.
+The farther from the door, the more occlusions and the more errors.
 
-**2. Prueba con un tramo corto** antes de comprometerte al video completo:
+**2. Test on a short segment** before committing to the full video
+(`--hasta` = "up to", in seconds):
 
 ```bash
 python contador.py --hasta 60
 ```
 
-**3. Revisa `salida/resultado.mp4`** y busca dónde el marcador brinca raro. Ahí
-está tu ajuste (ver la tabla de abajo). Repite el paso 2 hasta que se vea bien.
+**3. Review `salida/resultado.mp4`** and look for where the counter jumps
+oddly. That's where your tuning goes (see the table below). Repeat step 2 until
+it looks right.
 
-**4. Corre el video completo:**
+**4. Run the full video:**
 
 ```bash
 python contador.py
@@ -133,115 +135,118 @@ python contador.py
 
 ## Dashboard
 
-`dashboard/aforo.html` es un panel que presenta los resultados como si fueran la
-entrada de un restaurante: cuántos entraron, cuántos salieron, cuánta gente había
-dentro en cada momento, y la bitácora completa de cruces.
+`dashboard/aforo.html` is a panel that presents the results as if they were a
+restaurant entrance: how many came in, how many left, how many people were
+inside at each moment, and the full crossing log.
 
-Ábrelo con doble clic, no necesita servidor ni dependencias.
+Open it with a double click; it needs no server or dependencies.
 
-Los cruces son los reales que midió el sistema sobre `vtest.avi`. El encuadre de
-restaurante es una simulación: cuál dirección es "hacia adentro" se decide al
-calibrar la línea. Ninguna cifra proviene de un local real, y el panel lo dice.
+The crossings are the real ones the system measured on `vtest.avi`. The
+restaurant framing is a simulation: which direction counts as "inside" is
+decided when calibrating the line. No figure comes from a real venue, and the
+panel says so.
 
-## Estructura
+## Structure
 
-| Archivo | Qué hace |
+| File | What it does |
 |---|---|
-| `linea.py` | La lógica de cruce: signo, dirección, histéresis. Sin video ni YOLO |
-| `calibrar.py` | Defines la línea con dos clics, escribe `config.json` |
-| `contador.py` | Detecta, sigue, cuenta, escribe el CSV y el video anotado |
-| `validar.py` | Compara contra tu conteo manual y saca la exactitud |
-| `test_linea.py` | 8 pruebas de la lógica de conteo |
-| `config.json` | La línea, el video y los parámetros. Lo genera `calibrar.py` |
-| `salida/conteo.csv` | Un renglón por cruce: frame, segundo, ID, dirección |
-| `salida/resultado.mp4` | El video con cajas, IDs y el marcador |
+| `linea.py` | The crossing logic: sign, direction, hysteresis. No video or YOLO |
+| `calibrar.py` | Define the line with two clicks; writes `config.json` |
+| `contador.py` | Detects, tracks, counts, writes the CSV and the annotated video |
+| `validar.py` | Compares against your manual count and reports accuracy |
+| `test_linea.py` | 8 tests for the counting logic |
+| `config.json` | The line, the video and the parameters. Generated by `calibrar.py` |
+| `salida/conteo.csv` | One row per crossing: frame, second, ID, direction |
+| `salida/resultado.mp4` | The video with boxes, IDs and the counter |
 
-`linea.py` está separado a propósito: no importa OpenCV ni ultralytics, así que
-se puede probar en milisegundos sin cargar el modelo.
+`linea.py` is kept separate on purpose: it doesn't import OpenCV or
+ultralytics, so it can be tested in milliseconds without loading the model.
 
 ---
 
-## Ajustes en `config.json`
+## Settings in `config.json`
 
-| Clave | Cuándo tocarla |
+| Key | When to change it |
 |---|---|
-| `confianza` | Sube a 0.5 si detecta cosas que no son personas; baja a 0.25 si se le pasan |
-| `margen_px` | Sube si cuenta de más por temblor; baja si se le pasan cruces rápidos |
-| `imgsz` | 640 normal. 960 detecta gente lejana pero va más lento |
-| `direccion_positiva` | Cómo se llama el lado al que apunta la flecha (`entrada`, `izq_a_der`, …) |
+| `confianza` (confidence) | Raise to 0.5 if it detects things that aren't people; lower to 0.25 if it misses people |
+| `margen_px` (dead band) | Raise if it overcounts due to jitter; lower if it misses fast crossings |
+| `imgsz` | 640 is normal. 960 detects distant people but is slower |
+| `direccion_positiva` | Name of the side the arrow points to (`entrada`, `izq_a_der`, …) |
 
-Los nombres de las direcciones se propagan al CSV, al marcador del video y a
-`validar.py`. Si el CSV y el `config.json` no coinciden, `validar.py` avisa en
-vez de reportar ceros en silencio.
+Direction names propagate to the CSV, the video counter and `validar.py`. If
+the CSV and `config.json` don't match, `validar.py` warns you instead of
+silently reporting zeros.
 
 ---
 
-## Validación
+## Validation
 
-Sin esto, el proyecto es "el número que escupió el programa". Con esto, es "el
-sistema tiene X% de exactitud y estos son sus modos de falla".
+Without this, the project is "the number the program spat out". With it, it's
+"the system is X% accurate and these are its failure modes".
 
-Cuenta a mano un tramo del video y llena `validacion.csv`:
+Count a segment of the video by hand and fill in `validacion.csv`
+(start second, end second, actual positive crossings, actual negative crossings):
 
 ```csv
 inicio_s,fin_s,positivas_reales,negativas_reales
 0,300,42,17
 ```
 
-Luego:
+Then:
 
 ```bash
 python validar.py
 python validar.py --por-minuto
 ```
 
-Te da el error por tramo, el error total y el porcentaje de exactitud en cada
-dirección. La primera vez genera la plantilla vacía.
+It gives you the error per segment, the total error and the accuracy
+percentage for each direction. The first run generates the empty template.
 
-**Ojo con la métrica:** compara totales por tramo, no persona por persona. Un
-falso positivo y un falso negativo se cancelan entre sí, así que la exactitud
-real puede ser peor de lo que indica.
-
----
-
-## Sobre el valor `NETO`
-
-Es cruces positivos menos negativos. En una tienda equivale a **cuánta gente hay
-adentro**, pero solo si la tienda empezó vacía, todos usan esa puerta, y no hay
-errores.
-
-Ese último supuesto es el frágil: un error en un cruce afecta al total una vez,
-pero **desplaza el neto para siempre**. El neto además arrastra los errores de
-las dos direcciones a la vez.
-
-Por eso conviene reportar los totales como resultado principal y el neto como
-derivado, aclarando que su error crece con la duración del video.
-
-**Como verificación gratis:** un neto negativo en una tienda que empezó vacía es
-imposible. Si te sale negativo, es prueba de que el sistema está fallando.
+**Careful with the metric:** it compares totals per segment, not person by
+person. A false positive and a false negative cancel each other out, so real
+accuracy may be worse than reported.
 
 ---
 
-## Limitaciones conocidas
+## About the `NETO` (net) value
 
-- **Grupos apretados** que pasan juntos se detectan como menos personas.
-- **Cambio de ID** tras una oclusión larga puede contar a alguien dos veces. En
-  la prueba se asignaron 87 IDs para 18 personas que cruzaron.
-- **Gente lejana o muy pequeña** en el cuadro se pierde. Sube `imgsz`.
-- **Vista cenital pura no funciona.** YOLO viene entrenado con COCO, que es casi
-  todo fotos a nivel de piso o en ángulo oblicuo. Una persona vista desde
-  exactamente arriba no se parece a nada que el modelo haya aprendido. Esto
-  descarta la mayoría de los datasets públicos de conteo, que están grabados
-  desde el techo porque así se instalan los contadores comerciales.
+It's positive crossings minus negative crossings. In a store it equals **how
+many people are inside**, but only if the store started empty, everyone uses
+that door, and there are no errors.
+
+That last assumption is the fragile one: an error in one crossing affects the
+total once, but **shifts the net forever**. The net also carries the errors of
+both directions at once.
+
+That's why it's better to report the totals as the main result and the net as
+a derived figure, noting that its error grows with the length of the video.
+
+**As a free sanity check:** a negative net in a store that started empty is
+impossible. If you get a negative value, that's proof the system is failing.
 
 ---
 
-## Notas
+## Known limitations
 
-- `videos/vtest.avi` viene del repositorio de muestras de OpenCV
-  ([samples/data](https://github.com/opencv/opencv/tree/4.x/samples/data)). Se
-  incluye para que la prueba sea reproducible sin descargar nada.
-- Es un patio abierto, no una puerta, así que las etiquetas ahí son
-  `izq_a_der` / `der_a_izq` en vez de `entrada` / `salida`.
-- El entorno virtual y el modelo `.pt` no están en el repo: se regeneran con
-  `requirements.txt` y con la primera corrida.
+- **Tight groups** walking together get detected as fewer people.
+- **ID switches** after a long occlusion can count someone twice. In the test,
+  87 IDs were assigned for the 18 people who crossed.
+- **Distant or very small people** in the frame get lost. Raise `imgsz`.
+- **Pure top-down views don't work.** YOLO is trained on COCO, which is almost
+  entirely ground-level or oblique-angle photos. A person seen from directly
+  above doesn't look like anything the model has learned. This rules out most
+  public people-counting datasets, which are recorded from the ceiling because
+  that's how commercial counters are installed.
+
+---
+
+## Notes
+
+- `videos/vtest.avi` comes from the OpenCV samples repository
+  ([samples/data](https://github.com/opencv/opencv/tree/4.x/samples/data)). It's
+  included so the test is reproducible without downloading anything.
+- It's an open courtyard, not a doorway, so the labels there are
+  `izq_a_der` / `der_a_izq` (left-to-right / right-to-left) instead of
+  `entrada` / `salida` (entry / exit).
+- The virtual environment and the `.pt` model are not in the repo: they are
+  regenerated from `requirements.txt` and on the first run.
